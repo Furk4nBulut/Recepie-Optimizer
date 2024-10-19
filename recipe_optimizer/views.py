@@ -1,12 +1,44 @@
+from django.http import HttpResponse
 from django.shortcuts import render, redirect
 from .models import RecipeStep
 from .forms import RecipeStepForm
-from concurrent.futures import ThreadPoolExecutor
-from django.shortcuts import render, redirect
-from .models import RecipeStep
-from .forms import RecipeStepForm
-from concurrent.futures import ThreadPoolExecutor
-from django.db.models import Prefetch
+
+
+
+
+
+
+
+def index(request):
+    return render(request, "index.html")
+
+def add_new_recipe(request):
+    if request.method == 'POST':
+        form = RecipeStepForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('recipes_list')  # Yeni tarif eklendikten sonra tarif listesine yönlendirilir
+    else:
+        form = RecipeStepForm()
+
+    return render(request, 'add.html', {'form': form})
+
+
+def recipes_list(request):
+    steps = RecipeStep.objects.all()
+    return render(request, "list.html", {'steps': steps})
+
+
+def optimize_recipe(request):
+    steps = RecipeStep.objects.all()
+    results = []
+
+    if steps:
+        results = calculate_time(steps)  # Adımların zaman hesaplamasını yapar
+
+    return render(request, 'optimize_new.html', {'steps': steps, 'results': results})
+
+
 
 """
 'Malzemeleri Hazırla' starts at minute 0 and ends at minute 15.
@@ -75,7 +107,7 @@ def calculate_time(steps):
 
 
 
-# Tarif adımlarını optimize eden view
+"""# Tarif adımlarını optimize eden view
 def optimize_recipe(request):
     if request.method == 'POST':
         form = RecipeStepForm(request.POST)
@@ -92,4 +124,6 @@ def optimize_recipe(request):
     if steps:
         results = calculate_time(steps)
 
-    return render(request, 'recipe_optimizer/optimize.html', {'form': form, 'steps': steps, 'results': results})
+    return render(request, 'optimize.html', {'form': form, 'steps': steps, 'results': results})
+"""
+
