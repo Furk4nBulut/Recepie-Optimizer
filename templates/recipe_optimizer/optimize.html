@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recipe Optimizer</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        .form-container {
+            margin-bottom: 30px;
+        }
+        .results-container {
+            background-color: #f0f0f0;
+            padding: 10px;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Recipe Optimizer</h1>
+
+    <div class="form-container">
+        <h2>Add a Step</h2>
+        <form method="POST">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit">Add Step</button>
+        </form>
+    </div>
+
+    <div class="steps-container">
+        <h2>Recipe Steps</h2>
+        <ul>
+            {% for step in steps %}
+            <li>{{ step.name }} - {{ step.duration }} minutes (Chef Busy: {{ step.occupies_chef }})</li>
+            {% endfor %}
+        </ul>
+    </div>
+
+    <div class="results-container">
+        <h2>Optimization Results</h2>
+        <ul>
+            {% for result in results %}
+            <li>{{ result }}</li>
+            {% endfor %}
+        </ul>
+    </div>
+</body>
+</html>
