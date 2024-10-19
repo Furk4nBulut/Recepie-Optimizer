@@ -1,0 +1,66 @@
+{% extends 'base.html' %}
+{% block title %}Create Recipe{% endblock %}
+{% load form_tags %}
+
+{% block content %}
+<div class="container mt-5">
+    <!-- Breadcrumb Navigation -->
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'index' %}">Home</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Create Recipe</li>
+        </ol>
+    </nav>
+
+    <!-- Accordion Section -->
+    <div class="accordion mb-4" id="helpAccordion">
+        <div class="accordion-item">
+            <h2 class="accordion-header" id="headingOne">
+                <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                    What can you do on this page?
+                </button>
+            </h2>
+            <div id="collapseOne" class="accordion-collapse collapse show" aria-labelledby="headingOne" data-bs-parent="#helpAccordion">
+                <div class="accordion-body">
+                    On this page, you can create a new recipe by filling in the required fields. Make sure to provide a descriptive name and a short description for your recipe. Once completed, click the "Save Recipe" button to store your recipe. If you wish to cancel the operation, simply click the "Cancel" button to return to the home page.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card shadow-sm p-4">
+        <h1 class="mb-4 text-center">Create a New Recipe</h1>
+
+        <!-- Form Section -->
+        <form method="post" class="needs-validation" novalidate>
+            {% csrf_token %}
+
+            <!-- Name field with placeholder and validation feedback -->
+            <div class="form-group">
+                <label for="id_name">Recipe Name</label>
+                {{ form.name|add_class:"form-control" }}
+                <div class="invalid-feedback">
+                    Please provide a valid recipe name.
+                </div>
+            </div>
+
+            <!-- Description field -->
+            <div class="form-group mt-3">
+                <label for="id_description">Recipe Description</label>
+                {{ form.description|add_class:"form-control" }}
+                <small class="form-text text-muted">Provide a short description of the recipe.</small>
+            </div>
+
+            <!-- Save and cancel buttons -->
+            <div class="mt-4">
+                <button type="submit" class="btn btn-primary btn-lg mr-3">
+                    <i class="fas fa-save"></i> Save Recipe
+                </button>
+                <a href="{% url 'index' %}" class="btn btn-secondary btn-lg">
+                    <i class="fas fa-times"></i> Cancel
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

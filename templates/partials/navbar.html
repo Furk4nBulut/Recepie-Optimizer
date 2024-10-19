@@ -1,0 +1,31 @@
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <div class="container">
+        <a class="navbar-brand d-flex align-items-center" href="{% url 'index' %}">
+            <img src="https://www.canbula.com/cookie/chef.png" alt="Chef Logo" style="width: 30px; height: 30px; margin-right: 8px;">
+            Recipe Manager
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'index' %}">
+                        <i class="fas fa-home"></i> Home
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'create_recipe' %}">
+                        <i class="fas fa-plus"></i> Create Recipe
+                    </a>
+                </li>
+                <li class="nav-item">
+    <a class="nav-link" href="{% url 'recipe_list' %}">
+        <i class="fas fa-list"></i> Recipe List
+    </a>
+</li>
+
+            </ul>
+        </div>
+    </div>
+</nav>

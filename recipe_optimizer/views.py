@@ -1,54 +1,93 @@
-from django.http import HttpResponse
+from django.shortcuts import render, redirect, get_object_or_404
+from .models import Recipe, RecipeStep
+from .forms import RecipeForm, RecipeStepForm
+
 from django.shortcuts import render, redirect
-from .models import RecipeStep
-from .forms import RecipeStepForm
-
-
-
-
-
-
+from .models import Recipe, RecipeStep
+from .forms import RecipeForm, RecipeStepForm
 
 def index(request):
-    return render(request, "index.html")
+    # Tüm tarifleri al
+    recipes = Recipe.objects.all().order_by('-created_at')
+    return render(request, "index.html", {'recipes': recipes})
 
-def add_new_recipe(request):
+def create_recipe(request):
+    if request.method == 'POST':
+        form = RecipeForm(request.POST)
+        if form.is_valid():
+            form.save()  # Tarifi kaydet
+            return redirect('index')  # Ana sayfaya yönlendir
+    else:
+        form = RecipeForm()
+
+    return render(request, 'create_recipe.html', {'form': form})
+
+
+from django.shortcuts import render, get_object_or_404
+from .models import Recipe, RecipeStep
+
+
+def recipe_detail(request, recipe_id):
+    recipe = get_object_or_404(Recipe, id=recipe_id)
+    steps = RecipeStep.objects.filter(recipe=recipe)
+
+    step_times = []
+    chef_busy_until = 0  # Şefin meşgul olduğu zamanı takip etmek için
+
+    # Adımların başlama ve bitiş sürelerini hesapla
+    for step in steps:
+        if step.occupies_chef:
+            start_time = chef_busy_until
+        else:
+            start_time = 0  # Şef gerektirmeyen adımlar 0'dan başlayabilir
+
+        # Bitiş süresi
+        end_time = start_time + step.duration
+
+        # Şef meşgulse, zamanı güncelle
+        if step.occupies_chef:
+            chef_busy_until = end_time
+
+        # Adımı ve hesaplanan süreleri listeye ekle
+        step_times.append({
+            'step': step,
+            'start_time': start_time,
+            'end_time': end_time,
+        })
+
+    return render(request, 'recipe_detail.html', {
+        'recipe': recipe,
+        'step_times': step_times,
+    })
+
+
+def add_recipe_step(request, recipe_id):
+    recipe = Recipe.objects.get(id=recipe_id)
     if request.method == 'POST':
         form = RecipeStepForm(request.POST)
         if form.is_valid():
-            form.save()
-            return redirect('recipes_list')  # Yeni tarif eklendikten sonra tarif listesine yönlendirilir
+            step = form.save(commit=False)
+            step.recipe = recipe  # Adımı tarif ile ilişkilendir
+            step.save()  # Adımı kaydet
+            return redirect('recipe_detail', recipe_id=recipe.id)  # Tarif detayına yönlendir
     else:
         form = RecipeStepForm()
 
-    return render(request, 'add.html', {'form': form})
-
-
-def recipes_list(request):
-    steps = RecipeStep.objects.all()
-    return render(request, "list.html", {'steps': steps})
-
-
-def optimize_recipe(request):
-    steps = RecipeStep.objects.all()
-    results = []
-
-    if steps:
-        results = calculate_time(steps)  # Adımların zaman hesaplamasını yapar
-
-    return render(request, 'optimize_new.html', {'steps': steps, 'results': results})
+    return render(request, 'add_recipe_step.html', {'form': form, 'recipe': recipe})
 
 
 
-"""
-'Malzemeleri Hazırla' starts at minute 0 and ends at minute 15.
-'Fırını Isıt' starts at minute 0 and ends at minute 30.
-'Dolapta Beklet' starts at minute 15 and ends at minute 30.
-'Malzemeleri Karıştır' starts at minute 15 and ends at minute 30.
-'Sosu Hazırla' starts at minute 30 and ends at minute 45.
-'Pişir' starts at minute 30 and ends at minute 45.
+def recipe_list(request):
+    # Tüm tarifleri alıyoruz ve her bir tarife bağlı adımlara da erişiyoruz
+    recipes = Recipe.objects.prefetch_related('steps').all()
 
-"""
+    context = {
+        'recipes': recipes,  # Tarifler ve adımlar context'e ekleniyor
+    }
+
+    return render(request, 'recipe_list.html', context)
+
+
 def calculate_time(steps):
     results = []
     step_times = {}
@@ -100,30 +139,3 @@ def calculate_time(steps):
         steps = [step for step in steps if step not in [s for s, _, _ in current_batch]]
 
     return results
-
-
-
-
-
-
-
-"""# Tarif adımlarını optimize eden view
-def optimize_recipe(request):
-    if request.method == 'POST':
-        form = RecipeStepForm(request.POST)
-        if form.is_valid():
-            form.save()  # Yeni adımı kaydet
-            return redirect('optimize_recipe')
-    else:
-        form = RecipeStepForm()
-
-    steps = RecipeStep.objects.all()
-
-    # Zaman hesaplamayı çalıştır
-    results = []
-    if steps:
-        results = calculate_time(steps)
-
-    return render(request, 'optimize.html', {'form': form, 'steps': steps, 'results': results})
-"""
-

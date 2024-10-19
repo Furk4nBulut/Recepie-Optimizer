@@ -1,20 +1,39 @@
 {% extends 'base.html' %}
 
-{% block title %}Home{% endblock %}
+{% block title %}Recipe Management{% endblock %}
 
 {% block content %}
-<div class="text-center mt-5">
-    <h1>Welcome to the Recipe Management System</h1>
-    <div class="row mt-4">
-        <div class="col-md-4">
-            <a href="{% url 'recipes_list' %}" class="btn btn-primary btn-lg">View Recipes</a>
+<div class="container mt-5">
+    <h1 class="text-center mb-4">All Recipes</h1>
+
+    <div class="text-center mb-4">
+        <a href="{% url 'create_recipe' %}" class="btn btn-success btn-lg" style="border-radius: 25px;">
+            <i class="fas fa-plus"></i> Create New Recipe
+        </a>
+    </div>
+
+    <!-- Recipe Grid -->
+    <div class="row">
+        {% for recipe in recipes %}
+        <div class="col-md-4 mb-4">
+            <div class="card shadow-sm border-light rounded">
+                <div class="card-body">
+                    <h5 class="card-title">{{ recipe.name }}</h5>
+                    <p class="card-text text-muted">{{ recipe.description|truncatewords:15 }}</p>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <a href="{% url 'recipe_detail' recipe.id %}" class="btn btn-primary btn-sm">
+                            <i class="fas fa-eye"></i> View Details
+                        </a>
+                        <small class="text-muted">Created on {{ recipe.created_at|date:"F j, Y" }}</small>
+                    </div>
+                </div>
+            </div>
         </div>
-        <div class="col-md-4">
-            <a href="{% url 'add_new_recipe' %}" class="btn btn-success btn-lg">Add New Recipe</a>
+        {% empty %}
+        <div class="col-12">
+            <p class="text-center">No recipes found.</p>
         </div>
-        <div class="col-md-4">
-            <a href="{% url 'optimize_recipe' %}" class="btn btn-warning btn-lg">Optimize Recipes</a>
-        </div>
+        {% endfor %}
     </div>
 </div>
 {% endblock %}
