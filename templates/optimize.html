@@ -4,29 +4,57 @@
 
 {% block content %}
 <div class="container mt-5">
-    <h1 class="mb-4">Recipe Optimizer</h1>
+    <!-- Breadcrumb Navigation -->
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'index' %}">Home</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Recipe Optimizer</li>
+        </ol>
+    </nav>
+
+    <h1 class="mb-4 text-primary"><i class="fas fa-utensils"></i> Recipe Optimizer</h1>
+
+    <!-- Accordion Section -->
+    <div class="accordion mb-4" id="helpAccordion">
+        <div class="accordion-item">
+            <h2 class="accordion-header" id="headingOne">
+                <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                    What can you do on this page?
+                </button>
+            </h2>
+            <div id="collapseOne" class="accordion-collapse collapse show" aria-labelledby="headingOne" data-bs-parent="#helpAccordion">
+                <div class="accordion-body">
+                    On this page, you can create a new recipe by filling in the required fields. Make sure to provide a descriptive name and a short description for your recipe. Once completed, click the "Add Step" button to store your recipe step. If you wish to cancel the operation, simply click the "Cancel" button to return to the home page.
+                </div>
+            </div>
+        </div>
+    </div>
 
     <!-- Add a Step Form -->
-    <div class="card mb-4">
+    <div class="card mb-4 shadow-sm border-0">
         <div class="card-body">
-            <h2 class="card-title">Add a Step</h2>
+            <h2 class="card-title text-secondary"><i class="fas fa-plus"></i> Add a Step</h2>
             <form method="POST">
                 {% csrf_token %}
-                {{ form.as_p }}
-                <button type="submit" class="btn btn-primary mt-3">Add Step</button>
+                <div class="mb-3">
+                    {{ form.as_p }}
+                </div>
+                <button type="submit" class="btn btn-primary"><i class="fas fa-check"></i> Add Step</button>
             </form>
         </div>
     </div>
 
     <!-- Recipe Steps -->
-    <div class="card mb-4">
+    <div class="card mb-4 shadow-sm border-0">
         <div class="card-body">
-            <h2 class="card-title">Recipe Steps</h2>
-            <ul class="list-group">
+            <h2 class="card-title text-secondary"><i class="fas fa-list"></i> Recipe Steps</h2>
+            <ul class="list-group list-group-flush">
                 {% for step in steps %}
-                <li class="list-group-item">
-                    <strong>{{ step.name }}</strong> - {{ step.duration }} minutes
-                    <span class="text-muted">(Chef Busy: {{ step.occupies_chef }})</span>
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                    <div>
+                        <strong>{{ step.name }}</strong> - {{ step.duration }} minutes
+                    </div>
+                    <span class="badge bg-info text-white"><i class="fas fa-clock"></i> Chef Busy: {{ step.occupies_chef }}</span>
                 </li>
                 {% endfor %}
             </ul>
@@ -34,12 +62,12 @@
     </div>
 
     <!-- Optimization Results -->
-    <div class="card">
+    <div class="card shadow-sm border-0">
         <div class="card-body">
-            <h2 class="card-title">Optimization Results</h2>
-            <ul class="list-group">
+            <h2 class="card-title text-secondary"><i class="fas fa-chart-line"></i> Optimization Results</h2>
+            <ul class="list-group list-group-flush">
                 {% for result in results %}
-                <li class="list-group-item">{{ result }}</li>
+                <li class="list-group-item"><i class="fas fa-check-circle"></i> {{ result }}</li>
                 {% endfor %}
             </ul>
         </div>

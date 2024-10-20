@@ -4,11 +4,35 @@
 
 {% block content %}
 <div class="container mt-5">
-    <h1 class="text-center mb-4">Recipe List</h1>
+    <!-- Breadcrumb Navigation -->
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'index' %}">Home</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Recipe List</li>
+        </ol>
+    </nav>
+
+    <h1 class="text-center mb-4 text-primary"><i class="fas fa-book-open"></i> Recipe List</h1>
+
+    <!-- Accordion Section -->
+    <div class="accordion mb-4" id="helpAccordion">
+        <div class="accordion-item">
+            <h2 class="accordion-header" id="headingOne">
+                <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                    What can you do on this page?
+                </button>
+            </h2>
+            <div id="collapseOne" class="accordion-collapse collapse show" aria-labelledby="headingOne" data-bs-parent="#helpAccordion">
+                <div class="accordion-body">
+                    On this page, you can view all the recipes you've created. Each recipe includes its name, a brief description, and the date it was created. You can also view the detailed steps for each recipe by clicking the "View Details" button.
+                </div>
+            </div>
+        </div>
+    </div>
 
     <div class="table-responsive">
         <table class="table table-striped table-bordered">
-            <thead>
+            <thead class="table-light">
                 <tr>
                     <th scope="col">Recipe Name</th>
                     <th scope="col">Description</th>
@@ -23,18 +47,18 @@
                     <td>{{ recipe.description|truncatewords:15 }}</td>
                     <td>{{ recipe.created_at|date:"F j, Y" }}</td>
                     <td>
-                        <a href="{% url 'optimize' recipe.id %}" class="btn btn-primary btn-sm">
+                        <a href="{% url 'optimize' recipe.id %}" class="btn btn-info btn-sm">
                             <i class="fas fa-eye"></i> View Details
                         </a>
                     </td>
                 </tr>
 
-                <!-- Tarifin adımlarını gösteren satır -->
+                <!-- Recipe Steps -->
                 <tr>
                     <td colspan="4">
                         <div class="table-responsive">
                             <table class="table table-sm table-bordered mt-2">
-                                <thead>
+                                <thead class="table-secondary">
                                     <tr>
                                         <th scope="col">Step Name</th>
                                         <th scope="col">Duration (minutes)</th>
@@ -47,7 +71,7 @@
                                         <tr>
                                             <td>{{ step.name }}</td>
                                             <td>{{ step.duration }}</td>
-                                            <td>{{ step.occupies_chef|yesno:"Yes,No" }}</td>
+                                            <td>{{ step.occupies_chef|yesno:"Yes, No" }}</td>
                                         </tr>
                                         {% endfor %}
                                     {% else %}
@@ -61,10 +85,10 @@
                     </td>
                 </tr>
                 {% endfor %}
-                <!-- Eğer tarif yoksa "No recipes found" mesajı göster -->
+                <!-- No recipes found message -->
                 {% if not recipes %}
                 <tr>
-                    <td colspan="4" class="text-center">No recipes found.</td>
+                    <td colspan="4" class="text-center"><strong>No recipes found.</strong></td>
                 </tr>
                 {% endif %}
             </tbody>

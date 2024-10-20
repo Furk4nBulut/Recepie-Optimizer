@@ -4,12 +4,36 @@
 
 {% block content %}
 <div class="container mt-5">
-    <h1 class="text-center mb-4">All Recipes</h1>
+    <!-- Breadcrumb Navigation -->
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'index' %}">Home</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Recipe Management</li>
+        </ol>
+    </nav>
+
+    <h1 class="text-center mb-4 text-primary"><i class="fas fa-utensils"></i> All Recipes</h1>
 
     <div class="text-center mb-4">
         <a href="{% url 'create_recipe' %}" class="btn btn-success btn-lg" style="border-radius: 25px;">
             <i class="fas fa-plus"></i> Create New Recipe
         </a>
+    </div>
+
+    <!-- Accordion Section -->
+    <div class="accordion mb-4" id="helpAccordion">
+        <div class="accordion-item">
+            <h2 class="accordion-header" id="headingOne">
+                <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                    What can you do on this page?
+                </button>
+            </h2>
+            <div id="collapseOne" class="accordion-collapse collapse show" aria-labelledby="headingOne" data-bs-parent="#helpAccordion">
+                <div class="accordion-body">
+                    On this page, you can manage your recipes. You can view all your existing recipes and create new ones. Click on "Create New Recipe" to add a recipe, and "View Details" to see more information about each recipe.
+                </div>
+            </div>
+        </div>
     </div>
 
     <!-- Recipe Grid -->

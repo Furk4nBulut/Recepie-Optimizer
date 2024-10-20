@@ -22,7 +22,6 @@ def create_recipe(request):
 
 
 
-
 def recipe_list(request):
     # Tüm tarifleri alıyoruz ve her bir tarife bağlı adımlara da erişiyoruz
     recipes = Recipe.objects.prefetch_related('steps').all()
@@ -35,9 +34,6 @@ def recipe_list(request):
 
 
 
-
-
-
 def optimize_recipe(request, recipe_id):
     recipe = get_object_or_404(Recipe, pk=recipe_id)  # Get the recipe using recipe_id
 
@@ -47,7 +43,7 @@ def optimize_recipe(request, recipe_id):
             step = form.save(commit=False)
             step.recipe = recipe  # Assign the recipe
             step.save()  # Save the step with the assigned recipe
-            return redirect('optimize_recipe', recipe_id=recipe_id)
+            return redirect('optimize', recipe_id=recipe_id)
     else:
         form = RecipeStepForm()
 
