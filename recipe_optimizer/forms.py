@@ -7,7 +7,8 @@ class RecipeForm(forms.ModelForm):
         fields = ['name', 'description']
 
 
+
 class RecipeStepForm(forms.ModelForm):
     class Meta:
         model = RecipeStep
-        fields = ['name', 'duration', 'occupies_chef', 'prerequisites']
+        fields = ['name', 'duration', 'occupies_chef', 'prerequisites']  # Include prerequisites

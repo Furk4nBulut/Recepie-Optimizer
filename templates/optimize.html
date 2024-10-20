@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+
+{% block title %}Recipe Optimizer{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h1 class="mb-4">Recipe Optimizer</h1>
+
+    <!-- Add a Step Form -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <h2 class="card-title">Add a Step</h2>
+            <form method="POST">
+                {% csrf_token %}
+                {{ form.as_p }}
+                <button type="submit" class="btn btn-primary mt-3">Add Step</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Recipe Steps -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <h2 class="card-title">Recipe Steps</h2>
+            <ul class="list-group">
+                {% for step in steps %}
+                <li class="list-group-item">
+                    <strong>{{ step.name }}</strong> - {{ step.duration }} minutes
+                    <span class="text-muted">(Chef Busy: {{ step.occupies_chef }})</span>
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+
+    <!-- Optimization Results -->
+    <div class="card">
+        <div class="card-body">
+            <h2 class="card-title">Optimization Results</h2>
+            <ul class="list-group">
+                {% for result in results %}
+                <li class="list-group-item">{{ result }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+</div>
+{% endblock %}
