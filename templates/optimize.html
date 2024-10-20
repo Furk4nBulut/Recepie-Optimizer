@@ -4,18 +4,20 @@
 
 {% block content %}
 <div class="container mt-5">
-    <h1 class="mb-4 text-primary">Recipe Optimizer</h1>
+    <h1 class="mb-4 text-primary">Recipe Optimizer - {{ recipe.name }}</h1>
 
     <!-- Add a Step Form -->
     <div class="card mb-4 shadow-sm border-0">
         <div class="card-body">
-            <h2 class="card-title text-secondary">Add a Step</h2>
+            <h2 class="card-title text-secondary">Add or Edit a Step</h2>
             <form method="POST">
                 {% csrf_token %}
                 <div class="mb-3">
                     {{ form.as_p }}
                 </div>
-                <button type="submit" class="btn btn-primary">Add Step</button>
+                <button type="submit" class="btn btn-primary">
+                    {% if step %}Update Step{% else %}Add Step{% endif %}
+                </button>
             </form>
         </div>
     </div>
@@ -31,7 +33,15 @@
                         <strong>{{ step.name }}</strong> - {{ step.duration }} minutes
                     </div>
                     <span class="badge bg-info text-white">Chef Busy: {{ step.occupies_chef }}</span>
+
+                    <!-- Edit and Delete Buttons -->
+                    <div>
+                        <a href="{% url 'edit_step' recipe.id step.id %}" class="btn btn-sm btn-warning me-2">Edit</a>
+                        <a href="{% url 'delete_step' recipe.id step.id %}" class="btn btn-sm btn-danger">Delete</a>
+                    </div>
                 </li>
+                {% empty %}
+                <li class="list-group-item">No steps added yet.</li>
                 {% endfor %}
             </ul>
         </div>
@@ -42,9 +52,13 @@
         <div class="card-body">
             <h2 class="card-title text-secondary">Optimization Results</h2>
             <ul class="list-group list-group-flush">
-                {% for result in results %}
-                <li class="list-group-item">{{ result }}</li>
-                {% endfor %}
+                {% if results %}
+                    {% for result in results %}
+                    <li class="list-group-item">{{ result }}</li>
+                    {% endfor %}
+                {% else %}
+                    <li class="list-group-item">No optimization results available.</li>
+                {% endif %}
             </ul>
         </div>
     </div>

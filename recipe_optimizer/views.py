@@ -2,6 +2,12 @@ from .utils import calculate_time
 from .forms import RecipeForm, RecipeStepForm
 from django.shortcuts import render,get_object_or_404, redirect
 from .models import Recipe, RecipeStep
+from django.shortcuts import render, get_object_or_404, redirect
+from .models import Recipe, RecipeStep
+from .forms import RecipeStepForm
+from django.shortcuts import render, get_object_or_404, redirect
+from .models import Recipe, RecipeStep
+
 
 def index(request):
     # Tüm tarifleri al
@@ -58,3 +64,46 @@ def optimize_recipe(request, recipe_id):
         results = calculate_time(steps)
 
     return render(request, 'optimize.html', {'form': form, 'steps': steps, 'results': results, 'recipe': recipe})
+
+
+def edit_step(request, recipe_id, step_id=None):
+    recipe = get_object_or_404(Recipe, pk=recipe_id)  # Get the recipe based on the recipe_id
+
+    if step_id:
+        # If step_id is provided, we're editing an existing step
+        step = get_object_or_404(RecipeStep, pk=step_id, recipe=recipe)
+    else:
+        # Otherwise, we're adding a new step
+        step = None
+
+    if request.method == 'POST':
+        # If the request is POST, process the form data
+        form = RecipeStepForm(request.POST, instance=step, recipe=recipe)
+        if form.is_valid():
+            step = form.save(commit=False)
+            step.recipe = recipe  # Link the step to the current recipe
+            step.save()  # Save the step
+
+            # Save the many-to-many field (prerequisites)
+            form.save_m2m()
+
+            return redirect('optimize_recipe', recipe_id=recipe_id)
+    else:
+        # If GET, display the empty or populated form
+        form = RecipeStepForm(instance=step, recipe=recipe)
+
+    return render(request, 'edit_step.html', {
+        'form': form,
+        'recipe': recipe,
+        'step': step
+    })
+
+def delete_step(request, recipe_id, step_id):
+    recipe = get_object_or_404(Recipe, pk=recipe_id)
+    step = get_object_or_404(RecipeStep, pk=step_id, recipe=recipe)
+
+    if request.method == 'POST':
+        step.delete()  # Delete the step from the database
+        return redirect('optimize_recipe', recipe_id=recipe_id)
+
+    return render(request, 'confirm_delete.html', {'recipe': recipe, 'step': step})

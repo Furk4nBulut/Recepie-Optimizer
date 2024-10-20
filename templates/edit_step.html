@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+
+{% block title %}{% if step %}Edit Step{% else %}Add Step{% endif %}{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h1 class="mb-4 text-primary">
+        {% if step %}
+            Edit Step for "{{ recipe.name }}"
+        {% else %}
+            Add Step for "{{ recipe.name }}"
+        {% endif %}
+    </h1>
+    
+    <div class="card mb-4 shadow-sm border-0">
+        <div class="card-body">
+            <form method="POST">
+                {% csrf_token %}
+                {{ form.as_p }}
+                <button type="submit" class="btn btn-primary">
+                    {% if step %}Update Step{% else %}Add Step{% endif %}
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

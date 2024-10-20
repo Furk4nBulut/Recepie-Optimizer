@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+
+{% block title %}Delete Step{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h1 class="mb-4 text-danger">Confirm Step Deletion</h1>
+    <p>Are you sure you want to delete the step: <strong>{{ step.name }}</strong> from the recipe <strong>{{ recipe.name }}</strong>?</p>
+    
+    <form method="POST">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-danger">Delete</button>
+        <a href="{% url 'optimize_recipe' recipe.id %}" class="btn btn-secondary">Cancel</a>
+    </form>
+</div>
+{% endblock %}
