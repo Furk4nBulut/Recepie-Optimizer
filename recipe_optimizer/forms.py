@@ -7,8 +7,6 @@ class RecipeForm(forms.ModelForm):
         fields = ['name', 'description']
 
 
-
-
 class RecipeStepForm(forms.ModelForm):
     class Meta:
         model = RecipeStep
@@ -35,6 +33,10 @@ class RecipeStepForm(forms.ModelForm):
         }
 
     def __init__(self, *args, **kwargs):
+        recipe = kwargs.pop('recipe')  # Extract the recipe from kwargs
         super().__init__(*args, **kwargs)
         self.fields['occupies_chef'].label = "Requires Chef"  # Checkbox label
         self.fields['prerequisites'].label = "Prerequisites"  # Dropdown label
+
+        # Filter prerequisites to only show those related to the given recipe
+        self.fields['prerequisites'].queryset = RecipeStep.objects.filter(recipe=recipe)

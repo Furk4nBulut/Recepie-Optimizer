@@ -37,7 +37,7 @@ def optimize_recipe(request, recipe_id):
     recipe = get_object_or_404(Recipe, pk=recipe_id)  # Get the recipe using recipe_id
 
     if request.method == 'POST':
-        form = RecipeStepForm(request.POST)
+        form = RecipeStepForm(request.POST, recipe=recipe)  # Pass the recipe instance
         if form.is_valid():
             step = form.save(commit=False)
             step.recipe = recipe  # Assign the recipe
@@ -48,11 +48,11 @@ def optimize_recipe(request, recipe_id):
 
             return redirect('optimize', recipe_id=recipe_id)
     else:
-        form = RecipeStepForm()
+        form = RecipeStepForm(recipe=recipe)  # Pass the recipe instance
 
     steps = RecipeStep.objects.filter(recipe=recipe)  # Get steps for the recipe
 
-    # Zaman hesaplamayı çalıştır
+    # Time calculation
     results = []
     if steps:
         results = calculate_time(steps)
