@@ -2,6 +2,7 @@ def calculate_time(steps):
     results = []
     step_times = {}
     chef_busy_until = 0
+    last_end_time = 0
 
     while steps:
         current_batch = []  # İşlenecek adımlar
@@ -44,8 +45,9 @@ def calculate_time(steps):
         for step, start, end in current_batch:
             step_times[step] = {'start_time': start, 'end_time': end}
             results.append(f"'{step.name}' starts at minute {start} and ends at minute {end}.")
+            last_end_time = max(last_end_time, end)
 
         # İşlenen adımları listeden çıkar
         steps = [step for step in steps if step not in [s for s, _, _ in current_batch]]
 
-    return results
+    return results, last_end_time

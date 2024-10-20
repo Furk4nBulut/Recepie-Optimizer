@@ -60,11 +60,17 @@ def optimize_recipe(request, recipe_id):
 
     # Time calculation
     results = []
+    last_end_time = 0
     if steps:
-        results = calculate_time(steps)
+        results, last_end_time = calculate_time(steps)
 
-    return render(request, 'optimize.html', {'form': form, 'steps': steps, 'results': results, 'recipe': recipe})
-
+    return render(request, 'optimize.html', {
+        'form': form,
+        'steps': steps,
+        'results': results,
+        'last_end_time': last_end_time,
+        'recipe': recipe
+    })
 
 def edit_step(request, recipe_id, step_id=None):
     recipe = get_object_or_404(Recipe, pk=recipe_id)  # Get the recipe based on the recipe_id
