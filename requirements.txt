@@ -1,2 +1,8 @@
-django~=5.1
-pytest~=8.3.3
+asgiref==3.8.1
+Django==5.1.2
+iniconfig==2.0.0
+packaging==24.1
+pluggy==1.5.0
+pytest==8.3.3
+sqlparse==0.5.1
+whitenoise==6.7.0
