@@ -4,38 +4,21 @@
 
 {% block content %}
 <div class="container mt-5">
-    <h1 class="mb-4 text-primary">Recipe Optimizer - {{ recipe.name }}</h1>
+    <h1 class="mb-4 text-primary" id="recipe-name">Recipe Optimizer</h1>
 
     <!-- Add or Edit Step Form -->
     <div class="card mb-4 shadow-sm border-0">
         <div class="card-body">
-            <h2 class="card-title text-secondary">Add or Edit a Step</h2>
+            <h2 class="card-title text-secondary">
+                {% if step %}
+                    Edit Step for "{{ recipe.name }}"
+                {% else %}
+                    Add Step for "{{ recipe.name }}"
+                {% endif %}
+            </h2>
             <form method="POST">
                 {% csrf_token %}
-                <div class="mb-3">
-                    {{ form.name.label_tag }}
-                    {{ form.name }}
-                </div>
-
-                <div class="mb-3">
-                    {{ form.duration.label_tag }}
-                    {{ form.duration }}
-                </div>
-
-                <div class="mb-3">
-                    <div class="form-check">
-                        {{ form.occupies_chef }}
-                        {{ form.occupies_chef.label_tag }}
-                    </div>
-                </div>
-
-                <!-- Prerequisites with checkboxes -->
-                <div class="mb-3">
-                    <label for="id_prerequisites" class="form-label">Select Prerequisites:</label>
-                    <div class="form-check-group">
-                        {{ form.prerequisites }}
-                    </div>
-                </div>
+                {{ form.as_p }}
 
                 <button type="submit" class="btn btn-primary">
                     {% if step %}Update Step{% else %}Add Step{% endif %}
@@ -48,35 +31,8 @@
     <div class="card mb-4 shadow-sm border-0">
         <div class="card-body">
             <h2 class="card-title text-secondary">Recipe Steps</h2>
-            <ul class="list-group list-group-flush">
-                {% for step in steps %}
-                <li class="list-group-item d-flex justify-content-between align-items-center">
-                    <div class="d-flex align-items-center">
-                        <img src="https://www.canbula.com/cookie/chef.png" alt="Chef Icon" class="me-2" style="width: 30px; height: 30px;">
-
-                        <!-- Chef Status Indicator -->
-                        {% if step.occupies_chef %}
-                            <span class="dot" style="background-color: red;"></span>
-                        {% else %}
-                            <span class="dot" style="background-color: green;"></span>
-                        {% endif %}
-
-                        <strong class="ms-2">{{ step.name }}</strong> - {{ step.duration }} minutes
-                    </div>
-
-                    <!-- Edit and Delete Buttons with Icons -->
-                    <div>
-                        <a href="{% url 'edit_step' recipe.id step.id %}" class="btn btn-sm btn-warning me-2">
-                            <i class="bi bi-pencil"></i> Edit
-                        </a>
-                        <a href="{% url 'delete_step' recipe.id step.id %}" class="btn btn-sm btn-danger">
-                            <i class="bi bi-trash"></i> Delete
-                        </a>
-                    </div>
-                </li>
-                {% empty %}
-                <li class="list-group-item">No steps added yet.</li>
-                {% endfor %}
+            <ul class="list-group list-group-flush" id="steps-list">
+                <!-- Steps will be dynamically added here via JavaScript -->
             </ul>
         </div>
     </div>
@@ -85,35 +41,89 @@
     <div class="card mb-4 shadow-sm border-0">
         <div class="card-body">
             <h2 class="card-title text-secondary">Optimization Results</h2>
-            <ul class="list-group list-group-flush">
-                {% if results %}
-                    {% for result in results %}
-                    <li class="list-group-item">{{ result }}</li>
-                    {% endfor %}
-                {% else %}
-                    <li class="list-group-item">No optimization results available.</li>
-                {% endif %}
+            <ul class="list-group list-group-flush" id="optimization-results-list">
+                <!-- Optimization results will be dynamically added here via JavaScript -->
             </ul>
         </div>
     </div>
 
-    <!-- Total Time -->
+    <!-- Total Time and JSON Download Button -->
     <div class="card shadow-sm border-0">
         <div class="card-body d-flex align-items-center">
             <img src="https://www.canbula.com/cookie/cooking-time.png" alt="Clock Icon" class="me-3" style="width: 40px; height: 40px;">
-            <h2 class="card-title text-secondary fw-bold mb-0">
-                Your recipe took <span class="text-dark">{{ last_end_time }}</span> minutes to cook.
+            <h2 class="card-title text-secondary fw-bold mb-0" id="total-time">
+                <!-- Total time will be dynamically added here -->
             </h2>
+
+            <!-- JSON Download Button -->
+            <a href="/recipe-json/{{ recipe.id }}?download=true" class="btn btn-secondary ms-3">Download JSON</a>
         </div>
     </div>
 </div>
 
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    const recipeId = {{ recipe.id }};
+
+    fetch(`/recipe-json/${recipeId}/`)
+    .then(response => response.json())
+    .then(data => {
+        const recipeName = data.recipe.name;
+        const steps = data.recipe.steps;
+
+        document.getElementById('recipe-name').innerText = `Recipe Optimizer - ${recipeName}`;
+
+        const stepsList = document.getElementById('steps-list');
+        steps.forEach(step => {
+            const listItem = document.createElement('li');
+            listItem.classList.add('list-group-item');
+            listItem.innerHTML = `
+                <div class="d-flex justify-content-between align-items-center">
+                    <div class="d-flex align-items-center">
+                        <img src="https://www.canbula.com/cookie/chef.png" alt="Chef Icon" class="me-2" style="width: 30px; height: 30px;">
+                        <span class="dot" style="background-color: ${step.occupies_chef ? 'red' : 'green'};"></span>
+                        <strong class="ms-2">${step.name}</strong> - ${step.duration} minutes
+                    </div>
+                    <div>
+                        <a href="/edit-step/${recipeId}/${step.id}" class="btn btn-sm btn-warning me-2">
+                            <i class="bi bi-pencil"></i> Edit
+                        </a>
+                        <a href="/delete-step/${recipeId}/${step.id}" class="btn btn-sm btn-danger">
+                            <i class="bi bi-trash"></i> Delete
+                        </a>
+                    </div>
+                </div>
+            `;
+            stepsList.appendChild(listItem);
+        });
+
+        const optimizationResultsList = document.getElementById('optimization-results-list');
+        if (data.optimization_results && data.optimization_results.length > 0) {
+            data.optimization_results.forEach(result => {
+                const resultItem = document.createElement('li');
+                resultItem.classList.add('list-group-item');
+                resultItem.innerText = result;
+                optimizationResultsList.appendChild(resultItem);
+            });
+        } else {
+            const noResultItem = document.createElement('li');
+            noResultItem.classList.add('list-group-item');
+            noResultItem.innerText = "No optimization results available.";
+            optimizationResultsList.appendChild(noResultItem);
+        }
+
+        const totalTime = data.total_time || 0;
+        document.getElementById('total-time').innerText = `Your recipe took ${totalTime} minutes to cook.`;
+    })
+    .catch(error => console.error('Error fetching JSON data:', error));
+});
+</script>
 <style>
     .dot {
         width: 10px;
         height: 10px;
         border-radius: 50%;
-        margin-right: 5px; /* Space between dot and text */
+        margin-right: 10px;
     }
 
     .form-check-group {
@@ -134,17 +144,26 @@
         margin-bottom: 1.5rem !important;
     }
 
-    .form-check-label {
-        font-weight: bold;
-    }
-
     label {
-    display: flex;
+        display: flex;
     }
 
-</style>
+    .btn-warning {
+        background-color: #ffc107;
+        border-color: #ffc107;
+        color: white;
+    }
 
-<!-- Include Bootstrap Icons -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css">
+    .btn-danger {
+        background-color: #dc3545;
+        border-color: #dc3545;
+        color: white;
+    }
+
+    .bi-pencil, .bi-trash {
+        font-size: 16px;
+        vertical-align: middle;
+    }
+</style>
 
 {% endblock %}

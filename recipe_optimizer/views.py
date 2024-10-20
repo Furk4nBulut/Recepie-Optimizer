@@ -7,7 +7,8 @@ from .models import Recipe, RecipeStep
 from .forms import RecipeStepForm
 from django.shortcuts import render, get_object_or_404, redirect
 from .models import Recipe, RecipeStep
-
+from django.http import JsonResponse, HttpResponse
+import json
 
 def index(request):
     # Tüm tarifleri al
@@ -123,3 +124,39 @@ def delete_recipe(request, recipe_id):
         return redirect('index')  # Redirect to the recipe list (index)
 
     return render(request, 'confirm_delete.html', {'recipe': recipe})
+
+def recipe_json(request, recipe_id):
+    recipe = Recipe.objects.get(id=recipe_id)
+    steps = RecipeStep.objects.filter(recipe=recipe)
+
+    data = {
+        'recipe': {
+            'id': recipe.id,
+            'name': recipe.name,
+            'description': recipe.description,
+            'steps': [
+                {
+                    'id': step.id,
+                    'name': step.name,
+                    'duration': step.duration,
+                    'occupies_chef': step.occupies_chef,
+                    'prerequisites': [prereq.name for prereq in step.prerequisites.all()]
+                }
+                for step in steps
+            ]
+        }
+    }
+
+    results, last_end_time = calculate_time(steps)
+    data['optimization_results'] = results
+    data['total_time'] = last_end_time
+
+    if request.GET.get('download'):
+        response = HttpResponse(
+            json.dumps(data, indent=4),
+            content_type='application/json'
+        )
+        response['Content-Disposition'] = f'attachment; filename="recipe_{recipe_id}.json"'
+        return response
+
+    return JsonResponse(data)
