@@ -8,8 +8,6 @@ class RecipeForm(forms.ModelForm):
 
 
 
-from django import forms
-from .models import RecipeStep
 
 class RecipeStepForm(forms.ModelForm):
     class Meta:
@@ -36,8 +34,9 @@ class RecipeStepForm(forms.ModelForm):
             }),
         }
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, recipe=None, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        if recipe is not None:
+            self.fields['prerequisites'].queryset = RecipeStep.objects.filter(recipe=recipe)
         self.fields['occupies_chef'].label = "Requires Chef"  # Checkbox label
         self.fields['prerequisites'].label = "Prerequisites"  # Dropdown label
-
