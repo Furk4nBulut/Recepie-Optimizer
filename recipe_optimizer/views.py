@@ -113,3 +113,13 @@ def delete_step(request, recipe_id, step_id):
         return redirect('optimize_recipe', recipe_id=recipe_id)
 
     return render(request, 'confirm_delete.html', {'recipe': recipe, 'step': step})
+
+
+def delete_recipe(request, recipe_id):
+    recipe = get_object_or_404(Recipe, pk=recipe_id)
+
+    if request.method == 'POST':
+        recipe.delete()  # Delete the recipe from the database
+        return redirect('index')  # Redirect to the recipe list (index)
+
+    return render(request, 'confirm_delete.html', {'recipe': recipe})

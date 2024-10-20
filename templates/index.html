@@ -1,63 +1,82 @@
 {% extends 'base.html' %}
 
-{% block title %}Recipe Management{% endblock %}
+{% block title %}Recipe Book{% endblock %}
 
 {% block content %}
 <div class="container mt-5">
     <!-- Breadcrumb Navigation -->
     <nav aria-label="breadcrumb">
-        <ol class="breadcrumb">
+        <ol class="breadcrumb  p-3 rounded">
             <li class="breadcrumb-item"><a href="{% url 'index' %}">Home</a></li>
-            <li class="breadcrumb-item active" aria-current="page">Recipe Management</li>
+            <li class="breadcrumb-item active" aria-current="page">Recipe Book</li>
         </ol>
     </nav>
 
-    <h1 class="text-center mb-4 text-primary"><i class="fas fa-utensils"></i> All Recipes</h1>
+    <h1 class="text-center mb-5" style="font-family: 'Georgia', serif; color: #02205C;">
+        <i class="fas fa-book"></i> All Recipes
+    </h1>
 
-    <div class="text-center mb-4">
-        <a href="{% url 'create_recipe' %}" class="btn btn-success btn-lg" style="border-radius: 25px;">
-            <i class="fas fa-plus"></i> Create New Recipe
+    <div class="text-center mb-5">
+        <a href="{% url 'create_recipe' %}" class="btn btn-success btn-lg" style="border-radius: 25px; padding: 10px 30px;">
+            <i class="fas fa-plus"></i> Add New Recipe
         </a>
     </div>
 
-    <!-- Accordion Section -->
+    <!-- Accordion Section (Optional for Help) -->
     <div class="accordion mb-4" id="helpAccordion">
         <div class="accordion-item">
             <h2 class="accordion-header" id="headingOne">
                 <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
-                    What can you do on this page?
+                    How to Use this Recipe Book?
                 </button>
             </h2>
             <div id="collapseOne" class="accordion-collapse collapse show" aria-labelledby="headingOne" data-bs-parent="#helpAccordion">
                 <div class="accordion-body">
-                    On this page, you can manage your recipes. You can view all your existing recipes and create new ones. Click on "Create New Recipe" to add a recipe, and "View Details" to see more information about each recipe.
+                    Browse through the recipes like you're flipping through the pages of a book! Click "View Details" for more information or to edit recipes. You can delete a recipe by clicking the "Delete" button.
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Recipe Grid -->
+    <!-- Recipe Book Layout -->
     <div class="row">
         {% for recipe in recipes %}
-        <div class="col-md-4 mb-4">
-            <div class="card shadow-sm border-light rounded">
-                <div class="card-body">
-                    <h5 class="card-title">{{ recipe.name }}</h5>
-                    <p class="card-text text-muted">{{ recipe.description|truncatewords:15 }}</p>
+        <div class="col-md-6 mb-5">
+            <div class="card border-light shadow-sm rounded" style="border: 1px solid #ddd; background-color: #fdfdfd;">
+                <div class="card-body" style="padding: 2rem; position: relative;">
+                    <!-- Title styled like a book heading -->
+                    <h3 class="card-title" style="font-family: 'Georgia', serif; color: #02205C; font-size: 1.8rem;">{{ recipe.name }}</h3>
+
+                    <!-- Recipe description styled with a serif font -->
+                    <p class="card-text text-muted" style="font-family: 'Georgia', serif; font-size: 1.1rem;">
+                        {{ recipe.description|truncatewords:20 }}
+                    </p>
+
                     <div class="d-flex justify-content-between align-items-center">
-                        <a href="{% url 'optimize' recipe.id %}" class="btn btn-primary btn-sm">
-                            <i class="fas fa-eye"></i> View Details
+                        <a href="{% url 'optimize' recipe.id %}" class="btn btn-primary" style="border-radius: 15px; padding: 10px 20px;">
+                            <i class="fas fa-book-open"></i> View Details
                         </a>
-                        <small class="text-muted">Created on {{ recipe.created_at|date:"F j, Y" }}</small>
+                        <a href="{% url 'delete_recipe' recipe.id %}" class="btn btn-danger" style="border-radius: 15px; padding: 10px 20px;">
+                            <i class="fas fa-trash-alt"></i> Delete
+                        </a>
+                    </div>
+
+                    <!-- Date displayed like a book publication date -->
+                    <small class="text-muted d-block mt-4" style="font-family: 'Georgia', serif;">Published on {{ recipe.created_at|date:"F j, Y" }}</small>
+
+                    <!-- Decorative element like a book bookmark -->
+                    <div style="position: absolute; top: -10px; right: -10px;">
+                        <i class="fas fa-bookmark text-warning" style="font-size: 2rem;"></i>
                     </div>
                 </div>
             </div>
         </div>
         {% empty %}
         <div class="col-12">
-            <p class="text-center">No recipes found.</p>
+            <p class="text-center" style="font-family: 'Georgia', serif; color: #02205C;">No recipes found. Start adding to your recipe book now!</p>
         </div>
         {% endfor %}
     </div>
+
 </div>
 {% endblock %}
