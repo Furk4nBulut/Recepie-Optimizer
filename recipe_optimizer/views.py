@@ -1,10 +1,7 @@
-from django.shortcuts import render, redirect, get_object_or_404
-from .models import Recipe, RecipeStep
-from .forms import RecipeForm, RecipeStepForm
 from .utils import calculate_time
-from django.shortcuts import render, redirect
-from .models import Recipe, RecipeStep
 from .forms import RecipeForm, RecipeStepForm
+from django.shortcuts import render,get_object_or_404, redirect
+from .models import Recipe, RecipeStep
 
 def index(request):
     # Tüm tarifleri al
@@ -23,43 +20,6 @@ def create_recipe(request):
     return render(request, 'create_recipe.html', {'form': form})
 
 
-from django.shortcuts import render, get_object_or_404
-from .models import Recipe, RecipeStep
-
-
-def recipe_detail(request, recipe_id):
-    recipe = get_object_or_404(Recipe, id=recipe_id)
-    steps = RecipeStep.objects.filter(recipe=recipe)
-
-    step_times = []
-    chef_busy_until = 0  # Şefin meşgul olduğu zamanı takip etmek için
-
-    # Adımların başlama ve bitiş sürelerini hesapla
-    for step in steps:
-        if step.occupies_chef:
-            start_time = chef_busy_until
-        else:
-            start_time = 0  # Şef gerektirmeyen adımlar 0'dan başlayabilir
-
-        # Bitiş süresi
-        end_time = start_time + step.duration
-
-        # Şef meşgulse, zamanı güncelle
-        if step.occupies_chef:
-            chef_busy_until = end_time
-
-        # Adımı ve hesaplanan süreleri listeye ekle
-        step_times.append({
-            'step': step,
-            'start_time': start_time,
-            'end_time': end_time,
-        })
-
-    return render(request, 'recipe_detail.html', {
-        'recipe': recipe,
-        'step_times': step_times,
-    })
-
 
 
 
@@ -76,7 +36,6 @@ def recipe_list(request):
 
 
 
-from django.shortcuts import get_object_or_404, redirect
 
 
 def optimize_recipe(request, recipe_id):

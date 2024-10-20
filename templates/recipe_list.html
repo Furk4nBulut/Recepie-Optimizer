@@ -23,7 +23,7 @@
                     <td>{{ recipe.description|truncatewords:15 }}</td>
                     <td>{{ recipe.created_at|date:"F j, Y" }}</td>
                     <td>
-                        <a href="{% url 'recipe_detail' recipe.id %}" class="btn btn-primary btn-sm">
+                        <a href="{% url 'optimize' recipe.id %}" class="btn btn-primary btn-sm">
                             <i class="fas fa-eye"></i> View Details
                         </a>
                     </td>
