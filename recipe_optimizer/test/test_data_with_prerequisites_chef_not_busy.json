@@ -1,0 +1,32 @@
+{
+  "test_case_1": {
+    "steps": [
+      { "name": "Boil Water", "duration": 10, "occupies_chef": false, "prerequisites": [] },
+      { "name": "Chop Vegetables", "duration": 5, "occupies_chef": false, "prerequisites": [] }
+    ],
+    "expected": [
+      "'Boil Water' starts at minute 0 and ends at minute 10.",
+      "'Chop Vegetables' starts at minute 0 and ends at minute 5."
+    ]
+  },
+  "test_case_2": {
+    "steps": [
+      { "name": "Set Table", "duration": 3, "occupies_chef": false, "prerequisites": [] },
+      { "name": "Light Candles", "duration": 2, "occupies_chef": false, "prerequisites": [] }
+    ],
+    "expected": [
+      "'Set Table' starts at minute 0 and ends at minute 3.",
+      "'Light Candles' starts at minute 0 and ends at minute 2."
+    ]
+  },
+  "test_case_3": {
+    "steps": [
+      { "name": "Heat Pan", "duration": 5, "occupies_chef": false, "prerequisites": [] },
+      { "name": "Add Oil", "duration": 1, "occupies_chef": false, "prerequisites": [] }
+    ],
+    "expected": [
+      "'Heat Pan' starts at minute 0 and ends at minute 5.",
+      "'Add Oil' starts at minute 0 and ends at minute 1."
+    ]
+  }
+}

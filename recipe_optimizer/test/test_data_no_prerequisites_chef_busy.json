@@ -1,0 +1,33 @@
+{
+    "test_case_1": {
+      "steps": [
+        { "name": "Boil Water", "duration": 10, "occupies_chef": true, "prerequisites": [] },
+        { "name": "Prepare Salad", "duration": 5, "occupies_chef": true, "prerequisites": [] }
+      ],
+      "expected": [
+        "'Boil Water' starts at minute 0 and ends at minute 10.",
+        "'Prepare Salad' starts at minute 10 and ends at minute 15."
+      ]
+    },
+    "test_case_2": {
+      "steps": [
+        { "name": "Grill Vegetables", "duration": 15, "occupies_chef": true, "prerequisites": [] },
+        { "name": "Grill Meat", "duration": 20, "occupies_chef": true, "prerequisites": [] }
+      ],
+      "expected": [
+        "'Grill Vegetables' starts at minute 0 and ends at minute 15.",
+        "'Grill Meat' starts at minute 15 and ends at minute 35."
+      ]
+    },
+    "test_case_3": {
+      "steps": [
+        { "name": "Preheat Oven", "duration": 5, "occupies_chef": true, "prerequisites": [] },
+        { "name": "Bake Bread", "duration": 30, "occupies_chef": true, "prerequisites": [] }
+      ],
+      "expected": [
+        "'Preheat Oven' starts at minute 0 and ends at minute 5.",
+        "'Bake Bread' starts at minute 5 and ends at minute 35."
+      ]
+    }
+  }
+  

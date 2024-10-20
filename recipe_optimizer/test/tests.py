@@ -79,14 +79,42 @@ def steps_from_json(step_data):
 
 
 # Test verilerini çekip test işlemini yapma
-@pytest.mark.parametrize("test_case", load_test_data("test_data.json").items())
-def test_calculate_time(test_case):
+@pytest.mark.parametrize("test_case", load_test_data("test_data_no_prerequisites_chef_not_busy.json").items())
+def test_no_prerequisites_chef_not_busy(test_case):
     test_name, test_data = test_case
     steps = steps_from_json(test_data["steps"])
 
-    # calculate_time fonksiyonunu çalıştır
-    results = calculate_time(steps)  # Artık calculate_time'ı tekrar yazmak yerine direkt import ettik
+    results = calculate_time(steps)
 
-    # Beklenen sonuçları karşılaştır
+    expected = test_data["expected"]
+    assert results == expected
+
+@pytest.mark.parametrize("test_case", load_test_data("test_data_with_prerequisites_chef_not_busy.json").items())
+def test_with_prerequisites_chef_not_busy(test_case):
+    test_name, test_data = test_case
+    steps = steps_from_json(test_data["steps"])
+
+    results = calculate_time(steps)
+
+    expected = test_data["expected"]
+    assert results == expected
+
+@pytest.mark.parametrize("test_case", load_test_data("test_data_no_prerequisites_chef_busy.json").items())
+def test_no_prerequisites_chef_busy(test_case):
+    test_name, test_data = test_case
+    steps = steps_from_json(test_data["steps"])
+
+    results = calculate_time(steps)
+
+    expected = test_data["expected"]
+    assert results == expected
+
+@pytest.mark.parametrize("test_case", load_test_data("test_data_with_prerequisites_chef_busy.json").items())
+def test_with_prerequisites_chef_busy(test_case):
+    test_name, test_data = test_case
+    steps = steps_from_json(test_data["steps"])
+
+    results = calculate_time(steps)
+
     expected = test_data["expected"]
     assert results == expected

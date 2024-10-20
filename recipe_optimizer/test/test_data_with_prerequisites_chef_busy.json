@@ -1,0 +1,35 @@
+{
+    "test_case_1": {
+      "steps": [
+        { "name": "Start Oven", "duration": 5, "occupies_chef": true, "prerequisites": [] },
+        { "name": "Prepare Dough", "duration": 15, "occupies_chef": true, "prerequisites": ["Start Oven"] },
+        { "name": "Bake Pizza", "duration": 30, "occupies_chef": true, "prerequisites": ["Prepare Dough"] }
+      ],
+      "expected": [
+        "'Start Oven' starts at minute 0 and ends at minute 5.",
+        "'Prepare Dough' starts at minute 5 and ends at minute 20.",
+        "'Bake Pizza' starts at minute 20 and ends at minute 50."
+      ]
+    },
+    "test_case_2": {
+      "steps": [
+        { "name": "Boil Eggs", "duration": 8, "occupies_chef": true, "prerequisites": [] },
+        { "name": "Peel Eggs", "duration": 5, "occupies_chef": true, "prerequisites": ["Boil Eggs"] }
+      ],
+      "expected": [
+        "'Boil Eggs' starts at minute 0 and ends at minute 8.",
+        "'Peel Eggs' starts at minute 8 and ends at minute 13."
+      ]
+    },
+    "test_case_3": {
+      "steps": [
+        { "name": "Cook Rice", "duration": 20, "occupies_chef": true, "prerequisites": [] },
+        { "name": "Stir Fry Vegetables", "duration": 10, "occupies_chef": true, "prerequisites": ["Cook Rice"] }
+      ],
+      "expected": [
+        "'Cook Rice' starts at minute 0 and ends at minute 20.",
+        "'Stir Fry Vegetables' starts at minute 20 and ends at minute 30."
+      ]
+    }
+  }
+  

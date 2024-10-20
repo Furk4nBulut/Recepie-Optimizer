@@ -1,0 +1,32 @@
+{
+  "test_case_1": {
+    "steps": [
+      { "name": "Boil Water", "duration": 10, "occupies_chef": false, "prerequisites": [] },
+      { "name": "Cook Pasta", "duration": 15, "occupies_chef": false, "prerequisites": ["Boil Water"] }
+    ],
+    "expected": [
+      "'Boil Water' starts at minute 0 and ends at minute 10.",
+      "'Cook Pasta' starts at minute 10 and ends at minute 25."
+    ]
+  },
+  "test_case_2": {
+    "steps": [
+      { "name": "Wash Dishes", "duration": 5, "occupies_chef": false, "prerequisites": [] },
+      { "name": "Dry Dishes", "duration": 3, "occupies_chef": false, "prerequisites": ["Wash Dishes"] }
+    ],
+    "expected": [
+      "'Wash Dishes' starts at minute 0 and ends at minute 5.",
+      "'Dry Dishes' starts at minute 5 and ends at minute 8."
+    ]
+  },
+  "test_case_3": {
+    "steps": [
+      { "name": "Make Dough", "duration": 20, "occupies_chef": false, "prerequisites": [] },
+      { "name": "Rest Dough", "duration": 30, "occupies_chef": false, "prerequisites": ["Make Dough"] }
+    ],
+    "expected": [
+      "'Make Dough' starts at minute 0 and ends at minute 20.",
+      "'Rest Dough' starts at minute 20 and ends at minute 50."
+    ]
+  }
+}
