@@ -34,9 +34,7 @@ class RecipeStepForm(forms.ModelForm):
             }),
         }
 
-    def __init__(self, recipe=None, *args, **kwargs):
+    def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        if recipe is not None:
-            self.fields['prerequisites'].queryset = RecipeStep.objects.filter(recipe=recipe)
         self.fields['occupies_chef'].label = "Requires Chef"  # Checkbox label
         self.fields['prerequisites'].label = "Prerequisites"  # Dropdown label
