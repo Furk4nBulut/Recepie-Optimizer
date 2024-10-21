@@ -1,0 +1,2 @@
+export DJANGO_SETTINGS_MODULE=core.settings
+pytest recipe_optimizer/test_view.py
