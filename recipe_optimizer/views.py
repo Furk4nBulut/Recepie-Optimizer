@@ -4,6 +4,8 @@ from django.shortcuts import render, get_object_or_404, redirect
 from .models import Recipe, RecipeStep
 from django.http import JsonResponse, HttpResponse
 import json
+from django.views.decorators.csrf import csrf_exempt
+
 
 def index(request):
     """
@@ -14,6 +16,7 @@ def index(request):
     """
     recipes = Recipe.objects.all().order_by('-created_at')
     return render(request, "index.html", {'recipes': recipes})
+
 
 def create_recipe(request):
     """
@@ -35,6 +38,7 @@ def create_recipe(request):
 
     return render(request, 'create_recipe.html', {'form': form})
 
+
 def recipe_list(request):
     """
     Retrieves all recipes and their related steps and renders them on the recipe list page.
@@ -45,6 +49,7 @@ def recipe_list(request):
     recipes = Recipe.objects.prefetch_related('steps').all()
 
     return render(request, 'recipe_list.html', {'recipes': recipes})
+
 
 def optimize_recipe(request, recipe_id):
     """
@@ -80,6 +85,7 @@ def optimize_recipe(request, recipe_id):
         'recipe': recipe
     })
 
+
 def edit_step(request, recipe_id, step_id=None):
     """
     Edits an existing step or adds a new step to a recipe.
@@ -112,6 +118,7 @@ def edit_step(request, recipe_id, step_id=None):
         'step': step
     })
 
+
 def delete_step(request, recipe_id, step_id):
     """
     Deletes a specific step from a recipe.
@@ -131,6 +138,7 @@ def delete_step(request, recipe_id, step_id):
 
     return render(request, 'confirm_delete.html', {'recipe': recipe, 'step': step})
 
+
 def delete_recipe(request, recipe_id):
     """
     Deletes a specific recipe.
@@ -147,6 +155,7 @@ def delete_recipe(request, recipe_id):
         return redirect('index')
 
     return render(request, 'confirm_delete.html', {'recipe': recipe})
+
 
 def recipe_json(request, recipe_id):
     """
@@ -191,3 +200,44 @@ def recipe_json(request, recipe_id):
         return response
 
     return JsonResponse(data)
+
+
+@csrf_exempt
+def upload_json(request):
+    if request.method == 'POST':
+        try:
+            json_file = request.FILES['json-file']
+            json_data = json.load(json_file)
+
+            recipe_data = json_data.get('recipe')
+            if not recipe_data:
+                return JsonResponse({'success': False, 'error': 'Invalid JSON format'})
+
+            recipe, created = Recipe.objects.update_or_create(
+                name=recipe_data['name'],
+                defaults={
+                    'description': recipe_data['description']
+                }
+            )
+
+            for step_data in recipe_data.get('steps', []):
+                prerequisite_names = step_data.get('prerequisites', [])
+                prerequisites = RecipeStep.objects.filter(name__in=prerequisite_names, recipe=recipe)
+
+                step, created = RecipeStep.objects.update_or_create(
+                    recipe=recipe,
+                    name=step_data['name'],
+                    defaults={
+                        'duration': step_data['duration'],
+                        'occupies_chef': step_data['occupies_chef']
+                    }
+                )
+                step.prerequisites.set(prerequisites)
+                step.save()
+
+            return JsonResponse({'success': True})
+
+        except Exception as e:
+            return JsonResponse({'success': False, 'error': str(e)})
+
+    return JsonResponse({'success': False, 'error': 'Invalid request method'})

@@ -47,7 +47,7 @@
         </div>
     </div>
 
-    <!-- Total Time and JSON Download Button -->
+    <!-- Total Time and JSON Upload & Download Buttons -->
     <div class="card shadow-sm border-0">
         <div class="card-body d-flex align-items-center">
             <img src="https://www.canbula.com/cookie/cooking-time.png" alt="Clock Icon" class="me-3" style="width: 40px; height: 40px;">
@@ -57,6 +57,12 @@
 
             <!-- JSON Download Button -->
             <a href="/recipe-json/{{ recipe.id }}?download=true" class="btn btn-secondary ms-3">Download JSON</a>
+
+            <!-- JSON Upload Button -->
+            <form id="json-upload-form" enctype="multipart/form-data" class="ms-3">
+                <input type="file" id="json-upload" name="json-file" class="form-control">
+                <button type="button" class="btn btn-secondary mt-2" onclick="uploadJSON()">Upload JSON</button>
+            </form>
         </div>
     </div>
 </div>
@@ -117,6 +123,30 @@ document.addEventListener("DOMContentLoaded", function() {
     })
     .catch(error => console.error('Error fetching JSON data:', error));
 });
+
+    function uploadJSON() {
+    const fileInput = document.getElementById('json-upload');
+    const formData = new FormData();
+    formData.append('json-file', fileInput.files[0]);
+
+    fetch('/upload-json/', {
+        method: 'POST',
+        body: formData,
+        headers: {
+            'X-CSRFToken': '{{ csrf_token }}'
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert('Recipe successfully uploaded!');
+            location.reload();
+        } else {
+            alert('Error uploading recipe.');
+        }
+    })
+    .catch(error => console.error('Error uploading JSON:', error));
+}
 </script>
 <style>
     .dot {

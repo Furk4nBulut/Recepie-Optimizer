@@ -19,4 +19,5 @@ urlpatterns = [
     path('delete-step/<int:recipe_id>/<int:step_id>/', views.delete_step, name='delete_step'),
     path('recipe/delete/<int:recipe_id>/', views.delete_recipe, name='delete_recipe'),
     path('recipe-json/<int:recipe_id>/', views.recipe_json, name='recipe_json'),
+    path('upload-json/', views.upload_json, name='upload_json'),
 ]

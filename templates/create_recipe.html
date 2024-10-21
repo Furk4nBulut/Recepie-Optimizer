@@ -61,6 +61,44 @@
                 </a>
             </div>
         </form>
+
+        <!-- JSON Upload Section -->
+        <div class="mt-5">
+            <h2 class="text-center text-secondary">Or Upload Recipe via JSON</h2>
+            <form id="json-upload-form" enctype="multipart/form-data" class="text-center mt-3">
+                <input type="file" id="json-upload" name="json-file" class="form-control mb-3">
+                <button type="button" class="btn btn-secondary btn-lg" onclick="uploadJSON()">
+                    <i class="fas fa-file-upload"></i> Upload JSON
+                </button>
+            </form>
+        </div>
     </div>
 </div>
+
+<script>
+function uploadJSON() {
+    const fileInput = document.getElementById('json-upload');
+    const formData = new FormData();
+    formData.append('json-file', fileInput.files[0]);
+
+    fetch('/upload-json/', {
+        method: 'POST',
+        body: formData,
+        headers: {
+            'X-CSRFToken': '{{ csrf_token }}'
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert('Recipe successfully uploaded!');
+            location.reload();
+        } else {
+            alert('Error uploading recipe: ' + data.error);
+        }
+    })
+    .catch(error => console.error('Error uploading JSON:', error));
+}
+</script>
+
 {% endblock %}
