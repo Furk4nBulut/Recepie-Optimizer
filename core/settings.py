@@ -23,7 +23,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-8&r&edi3jh!t)2fvf3@7t566(d8uz6(o8&b5!d+@k61x3xpm1%'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = ['*']
 
@@ -91,7 +91,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'verceldb',  # Replace with your database name
         'USER': 'default',  # Replace with your database username
-        'PASSWORD': 'Yo8qEgDmlXI3',  # Replace with your database password
+        'PASSWORD': 'ZCg9GcoOap2V',  # Replace with your database password
         'HOST': 'ep-proud-bird-a2zkswqt-pooler.eu-central-1.aws.neon.tech',  # Replace with your PostgreSQL host, if different
         'PORT': '5432',  # Default PostgreSQL port (you can change if needed)
     }
