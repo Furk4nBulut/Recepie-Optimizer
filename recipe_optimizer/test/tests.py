@@ -7,21 +7,17 @@ def calculate_time(steps):
     chef_busy_until = 0
 
     while steps:
-        current_batch = []  # İşlenecek adımlar
-
+        current_batch = []
         for step in steps:
-            # Ön koşulları kontrol et (listeyi kontrol et)
             if step.prerequisites:
                 if not all(prerequisite in step_times for prerequisite in step.prerequisites):
-                    continue  # Ön koşullar tamamlanmadı
+                    continue
 
-            # Adımın başlangıç zamanını hesapla
             if step.occupies_chef:
                 start_time = chef_busy_until
             else:
                 start_time = 0
 
-            # Ön koşul bitiş zamanlarını kontrol et
             if step.prerequisites:
                 prerequisite_end_times = [
                     step_times[prerequisite]['end_time']
@@ -31,22 +27,17 @@ def calculate_time(steps):
                 if prerequisite_end_times:
                     start_time = max(start_time, max(prerequisite_end_times))
 
-            # Adımın bitiş zamanını hesapla
             end_time = start_time + step.duration
 
-            # Mevcut adımı ekle
             current_batch.append((step, start_time, end_time))
 
-            # Şef meşgulse, zamanı güncelle
             if step.occupies_chef:
                 chef_busy_until = end_time
 
-        # Mevcut adımları işle
         for step, start, end in current_batch:
             step_times[step] = {'start_time': start, 'end_time': end}
             results.append(f"'{step.name}' starts at minute {start} and ends at minute {end}.")
 
-        # İşlenen adımları listeden çıkar
         steps = [step for step in steps if step not in [s for s, _, _ in current_batch]]
 
     return results
@@ -58,13 +49,11 @@ class Step:
         self.prerequisites = prerequisites if prerequisites else []
 
 
-# Test verilerini JSON dosyasından yükleme
 def load_test_data(file_path):
     with open(file_path, 'r') as file:
         return json.load(file)
 
 
-# Test verilerini kullanarak Step nesneleri oluşturma
 def steps_from_json(step_data):
     step_dict = {}
     for step_info in step_data:
@@ -78,7 +67,6 @@ def steps_from_json(step_data):
     return list(step_dict.values())
 
 
-# Test verilerini çekip test işlemini yapma
 @pytest.mark.parametrize("test_case", load_test_data("test_data_no_prerequisites_chef_not_busy.json").items())
 def test_no_prerequisites_chef_not_busy(test_case):
     test_name, test_data = test_case
