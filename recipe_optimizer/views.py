@@ -1,69 +1,76 @@
 from .utils import calculate_time
 from .forms import RecipeForm, RecipeStepForm
-from django.shortcuts import render,get_object_or_404, redirect
-from .models import Recipe, RecipeStep
-from django.shortcuts import render, get_object_or_404, redirect
-from .models import Recipe, RecipeStep
-from .forms import RecipeStepForm
 from django.shortcuts import render, get_object_or_404, redirect
 from .models import Recipe, RecipeStep
 from django.http import JsonResponse, HttpResponse
 import json
 
 def index(request):
-    # Tüm tarifleri al
+    """
+    Retrieves all recipes and renders them on the index page.
+
+    :param request: The HTTP request object.
+    :returns: Renders the 'index.html' template with a list of all recipes ordered by creation date.
+    """
     recipes = Recipe.objects.all().order_by('-created_at')
     return render(request, "index.html", {'recipes': recipes})
 
 def create_recipe(request):
+    """
+    Handles the creation of a new recipe.
+
+    If the request method is POST and the form is valid, saves the recipe and redirects to the index page.
+    Otherwise, displays the form for creating a recipe.
+
+    :param request: The HTTP request object.
+    :returns: Renders the 'create_recipe.html' template with the recipe form.
+    """
     if request.method == 'POST':
         form = RecipeForm(request.POST)
         if form.is_valid():
-            form.save()  # Tarifi kaydet
-            return redirect('index')  # Ana sayfaya yönlendir
+            form.save()
+            return redirect('index')
     else:
         form = RecipeForm()
 
     return render(request, 'create_recipe.html', {'form': form})
 
-
-
-
 def recipe_list(request):
-    # Tüm tarifleri alıyoruz ve her bir tarife bağlı adımlara da erişiyoruz
+    """
+    Retrieves all recipes and their related steps and renders them on the recipe list page.
+
+    :param request: The HTTP request object.
+    :returns: Renders the 'recipe_list.html' template with a list of all recipes and their steps.
+    """
     recipes = Recipe.objects.prefetch_related('steps').all()
 
-    context = {
-        'recipes': recipes,  # Tarifler ve adımlar context'e ekleniyor
-    }
-
-    return render(request, 'recipe_list.html', context)
-
+    return render(request, 'recipe_list.html', {'recipes': recipes})
 
 def optimize_recipe(request, recipe_id):
-    recipe = get_object_or_404(Recipe, pk=recipe_id)  # Get the recipe using recipe_id
+    """
+    Handles the optimization of a recipe by adding steps and calculating the time for each step.
+
+    :param request: The HTTP request object.
+    :param recipe_id: The ID of the recipe to be optimized.
+    :returns: Renders the 'optimize.html' template with the form to add steps, the list of steps, and time calculation results.
+    :raises Http404: If the recipe with the given ID does not exist.
+    """
+    recipe = get_object_or_404(Recipe, pk=recipe_id)
 
     if request.method == 'POST':
-        form = RecipeStepForm(request.POST, recipe=recipe)  # Pass the recipe instance
+        form = RecipeStepForm(request.POST, recipe=recipe)
         if form.is_valid():
             step = form.save(commit=False)
-            step.recipe = recipe  # Assign the recipe
-            step.save()  # Save the step with the assigned recipe
+            step.recipe = recipe
+            step.save()
+            form.save_m2m()
 
-            # Save the prerequisites (ManyToMany field)
-            form.save_m2m()  # This saves the ManyToMany relationships
-
-            return redirect('optimize', recipe_id=recipe_id)
+            return redirect('optimize_recipe', recipe_id=recipe_id)
     else:
-        form = RecipeStepForm(recipe=recipe)  # Pass the recipe instance
+        form = RecipeStepForm(recipe=recipe)
 
-    steps = RecipeStep.objects.filter(recipe=recipe)  # Get steps for the recipe
-
-    # Time calculation
-    results = []
-    last_end_time = 0
-    if steps:
-        results, last_end_time = calculate_time(steps)
+    steps = RecipeStep.objects.filter(recipe=recipe)
+    results, last_end_time = calculate_time(steps) if steps else ([], 0)
 
     return render(request, 'optimize.html', {
         'form': form,
@@ -74,29 +81,29 @@ def optimize_recipe(request, recipe_id):
     })
 
 def edit_step(request, recipe_id, step_id=None):
-    recipe = get_object_or_404(Recipe, pk=recipe_id)  # Get the recipe based on the recipe_id
+    """
+    Edits an existing step or adds a new step to a recipe.
 
-    if step_id:
-        # If step_id is provided, we're editing an existing step
-        step = get_object_or_404(RecipeStep, pk=step_id, recipe=recipe)
-    else:
-        # Otherwise, we're adding a new step
-        step = None
+    :param request: The HTTP request object.
+    :param recipe_id: The ID of the recipe to which the step belongs.
+    :param step_id: The ID of the step to be edited (if any).
+    :returns: Renders the 'edit_step.html' template with the form for editing or adding a step.
+    :raises Http404: If the recipe or step does not exist.
+    """
+    recipe = get_object_or_404(Recipe, pk=recipe_id)
+
+    step = get_object_or_404(RecipeStep, pk=step_id, recipe=recipe) if step_id else None
 
     if request.method == 'POST':
-        # If the request is POST, process the form data
         form = RecipeStepForm(request.POST, instance=step, recipe=recipe)
         if form.is_valid():
             step = form.save(commit=False)
-            step.recipe = recipe  # Link the step to the current recipe
-            step.save()  # Save the step
-
-            # Save the many-to-many field (prerequisites)
+            step.recipe = recipe
+            step.save()
             form.save_m2m()
 
             return redirect('optimize_recipe', recipe_id=recipe_id)
     else:
-        # If GET, display the empty or populated form
         form = RecipeStepForm(instance=step, recipe=recipe)
 
     return render(request, 'edit_step.html', {
@@ -106,26 +113,50 @@ def edit_step(request, recipe_id, step_id=None):
     })
 
 def delete_step(request, recipe_id, step_id):
+    """
+    Deletes a specific step from a recipe.
+
+    :param request: The HTTP request object.
+    :param recipe_id: The ID of the recipe to which the step belongs.
+    :param step_id: The ID of the step to be deleted.
+    :returns: Redirects to the optimize recipe page after deletion.
+    :raises Http404: If the recipe or step does not exist.
+    """
     recipe = get_object_or_404(Recipe, pk=recipe_id)
     step = get_object_or_404(RecipeStep, pk=step_id, recipe=recipe)
 
     if request.method == 'POST':
-        step.delete()  # Delete the step from the database
+        step.delete()
         return redirect('optimize_recipe', recipe_id=recipe_id)
 
     return render(request, 'confirm_delete.html', {'recipe': recipe, 'step': step})
 
-
 def delete_recipe(request, recipe_id):
+    """
+    Deletes a specific recipe.
+
+    :param request: The HTTP request object.
+    :param recipe_id: The ID of the recipe to be deleted.
+    :returns: Redirects to the index page after deletion.
+    :raises Http404: If the recipe does not exist.
+    """
     recipe = get_object_or_404(Recipe, pk=recipe_id)
 
     if request.method == 'POST':
-        recipe.delete()  # Delete the recipe from the database
-        return redirect('index')  # Redirect to the recipe list (index)
+        recipe.delete()
+        return redirect('index')
 
     return render(request, 'confirm_delete.html', {'recipe': recipe})
 
 def recipe_json(request, recipe_id):
+    """
+    Returns the recipe and its steps in JSON format, with an option to download.
+
+    :param request: The HTTP request object.
+    :param recipe_id: The ID of the recipe to retrieve.
+    :returns: A JSON response containing the recipe and its steps. Optionally, allows downloading as a JSON file.
+    :raises Http404: If the recipe does not exist.
+    """
     recipe = Recipe.objects.get(id=recipe_id)
     steps = RecipeStep.objects.filter(recipe=recipe)
 

@@ -1,3 +1,11 @@
+"""
+URL patterns for the recipe application.
+
+The following URL routes map to different views handling recipe and step-related functionalities.
+
+:var urlpatterns: List of URL patterns mapping URLs to views.
+"""
+
 from django.urls import path
 from . import views
 
