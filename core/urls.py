@@ -18,6 +18,6 @@ from django.contrib import admin
 from django.urls import path,include
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
-    path('', include('recipe_optimizer.urls')),
+    path('recipe-optimizer/admin/', admin.site.urls),
+    path('recipe-optimizer/', include('recipe_optimizer.urls')),
 ]
